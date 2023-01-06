@@ -13,8 +13,8 @@ var Upgrader = wSocket.Upgrader{}
 func main() {
 	router := http.NewServeMux()
 	router.Handle("/", http.FileServer(http.Dir("../../template")))
-	router.Handle("/post/", http.StripPrefix("/post/", http.FileServer(http.Dir("../../template"))))
-	router.HandleFunc("/ws", getWebSocket)
+	//router.Handle("/post/", http.StripPrefix("/post/", http.FileServer(http.Dir("../../template"))))
+	//router.HandleFunc("/ws", getWebSocket)
 	go func() {
 		if err := http.ListenAndServe(":8000", router); err != nil {
 			panic(err.Error())
