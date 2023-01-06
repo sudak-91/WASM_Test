@@ -2,10 +2,12 @@ package htmlelement
 
 import "syscall/js"
 
-const Document = js.Global().Get("document")
+func GetDocument() js.Value {
+	return js.Global().Get("document")
+}
 
 func QuerySelector(element string) js.Value {
-	return Document.Call("querySelector", element)
+	return GetDocument().Call("querySelector", element)
 }
 
 //Renderer it's interface to Render html page
@@ -21,7 +23,7 @@ type JsGeter interface {
 //HtmlElement struct of default html element
 type HtmlElement struct {
 	elem         js.Value //Instanse of HTMLElement(div, button, etc..)
-	ChildElement []Renderer
+	ChildElement []interface{}
 }
 
 //AppendChild add element to DOM model
@@ -29,8 +31,12 @@ func (h *HtmlElement) AppendChild(child js.Value) {
 	h.elem.Call("appendChild", child)
 }
 
+func (h *HtmlElement) Set(setType string, value string) {
+	h.elem.Set(setType, value)
+}
+
 //AddChild add child element to ChildElement slice
-func (h *HtmlElement) AddChild(child Renderer) {
+func (h *HtmlElement) AddChild(child interface{}) {
 	h.ChildElement = append(h.ChildElement, child)
 }
 

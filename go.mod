@@ -1,11 +1,13 @@
 module github.com/sudak-91/wasm-test
 
-go 1.18
+go 1.19
 
 require (
 	github.com/BurntSushi/toml v1.2.1 // indirect
 	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/gorilla/mux v1.8.0 // indirect
+	github.com/gorilla/websocket v1.5.0 // indirect
+	github.com/klauspost/compress v1.15.14 // indirect
 	github.com/sergi/go-diff v1.1.0 // indirect
 	golang.org/x/exp v0.0.0-20221031165847-c99f073a8326 // indirect
 	golang.org/x/exp/typeparams v0.0.0-20221031165847-c99f073a8326 // indirect
@@ -19,4 +21,5 @@ require (
 	honnef.co/go/tools v0.3.3 // indirect
 	mvdan.cc/gofumpt v0.4.0 // indirect
 	mvdan.cc/xurls/v2 v2.4.0 // indirect
+	nhooyr.io/websocket v1.8.7 // indirect
 )
