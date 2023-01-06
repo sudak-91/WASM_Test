@@ -31,7 +31,7 @@ func main() {
 		//TestButton      = htmlelement.NewButton()
 		//ButtonWithParam = htmlelement.NewButton()
 		u = url.URL{Scheme: "ws",
-			Host: "localhost:8000",
+			Host: "0.0.0.0:8000",
 			Path: "/ws"}
 	)
 	fmt.Println("Connect to", u)
