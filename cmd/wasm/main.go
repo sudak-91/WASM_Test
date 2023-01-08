@@ -9,12 +9,13 @@ import (
 	"time"
 
 	"github.com/sudak-91/wasm-test/internal/front/elements"
+	"github.com/sudak-91/wasm-test/internal/types"
 	"github.com/sudak-91/wasm-test/pkg/htmlelement"
 	"nhooyr.io/websocket"
 	"nhooyr.io/websocket/wsjson"
 )
 
-var data = make(chan string)
+var data = make(chan types.Update)
 
 func main() {
 	var (
@@ -93,7 +94,7 @@ func Render(body *htmlelement.Body) {
 	body.AddChild(container)
 	container.AddClass("container")
 	elements.CreateHeader(container)
-	elements.CreateMainBody(container)
+	elements.CreateMainBody(container, data)
 	body.Render()
 
 }
@@ -120,7 +121,7 @@ func TestButtonWithParam(this js.Value, args []js.Value) any {
 	//a := this.Get("value")
 	//fmt.Println(a)
 	fmt.Println(args[0].String())
-	data <- args[0].String()
+	data <- types.Update{Type: "test"}
 	return nil
 }
 

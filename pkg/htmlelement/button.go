@@ -5,6 +5,7 @@ import "syscall/js"
 type Button struct {
 	HtmlElement
 	HtmlClass
+	HtmlAttribute
 	Type string
 }
 
