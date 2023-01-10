@@ -8,17 +8,16 @@ import (
 type MainBody struct {
 }
 
-func CreateMainBody(container *htmlelement.Div, ctx chan types.Update) *htmlelement.Div {
-	mainBody := container.CreateChildDiv()
+func CreateMainBody(container htmlelement.Parent, ctx chan types.Update) *htmlelement.Div {
+	mainBody := htmlelement.NewDiv(container, "mainBody")
 	mainBody.AddClass("row")
-	leftSidebar := mainBody.CreateChildDiv()
+	leftSidebar := htmlelement.NewDiv(mainBody, "leftSideBar")
 	leftSidebar.AddClass("col-4")
 
 	singIn := NewSignIn(ctx)
-	s := singIn.CreateSignIn()
+	singIn.CreateSignIn(leftSidebar)
 
-	leftSidebar.AddChild(s)
-	mainFrame := mainBody.CreateChildDiv()
+	mainFrame := htmlelement.NewDiv(mainBody, "mainFrame")
 	mainFrame.AddClass("col-8")
 	return mainBody
 }

@@ -3,15 +3,20 @@ package htmlelement
 type Input struct {
 	HtmlElement
 	HtmlClass
-	Type string
+	Type   string
+	Id     string
+	parent Parent
 }
 
-func NewInput(inputType string) *Input {
+func NewInput(parent Parent, id string, inputType string) *Input {
 	var (
 		input Input
 	)
-	input.elem = GetDocument().Call("createElement", "input")
+	//input.elem = GetDocument().Call("createElement", "input")
 	input.Type = inputType
+	input.Id = id
+	input.parent = parent
+	parent.SetChild(&input)
 	return &input
 }
 
@@ -22,6 +27,8 @@ func GetInputValue(inputId string) string {
 }
 
 func (i *Input) Render() {
+	i.CreateElement("input")
+	i.set("type", i.Type)
+	i.SetId(i.Id)
 	i.AddClassSliceToClassList(i.GetJs())
-	i.Set("type", i.Type)
 }

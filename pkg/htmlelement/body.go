@@ -1,6 +1,8 @@
 package htmlelement
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type Body struct {
 	HtmlElement
@@ -10,11 +12,11 @@ func GetBody() *Body {
 	var (
 		body Body
 	)
-	body.elem = QuerySelector("body")
+
 	return &body
 }
-
 func (b *Body) Render() {
+	b.elem = GetDocument().Call("querySelector", "body")
 	fmt.Println("Start Body Render")
 	for _, v := range b.ChildElement {
 		fmt.Printf("Element is %v\n", v)

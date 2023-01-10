@@ -20,6 +20,11 @@ type JsGeter interface {
 	GetJs() js.Value
 }
 
+//Parent - interface to eject depend
+type Parent interface {
+	SetChild(child any)
+}
+
 //HtmlElement struct of default html element
 type HtmlElement struct {
 	elem         js.Value //Instanse of HTMLElement(div, button, etc..)
@@ -31,18 +36,26 @@ func (h *HtmlElement) AppendChild(child js.Value) {
 	h.elem.Call("appendChild", child)
 }
 
-func (h *HtmlElement) Set(setType string, value string) {
+func (h *HtmlElement) set(setType string, value string) {
 	h.elem.Set(setType, value)
 }
+func (h *HtmlElement) CreateElement(element string) {
+	h.elem = GetDocument().Call("createElement", element)
+}
 
-//AddChild add child element to ChildElement slice
-func (h *HtmlElement) AddChild(child interface{}) {
-	h.ChildElement = append(h.ChildElement, child)
+func (h *HtmlElement) SetInnerHtml(value string) {
+	h.set("innerHTML", value)
+}
+func (h *HtmlElement) SetId(id string) {
+	h.set("id", id)
 }
 
 //GetJs return java script object
 func (h *HtmlElement) GetJs() js.Value {
 	return h.elem
+}
+func (h *HtmlElement) SetChild(child any) {
+	h.ChildElement = append(h.ChildElement, child)
 }
 
 type HtmlClass struct {

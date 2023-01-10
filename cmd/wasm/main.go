@@ -90,8 +90,7 @@ func main() {
 	<-b
 }
 func Render(body *htmlelement.Body) {
-	container := htmlelement.NewDiv()
-	body.AddChild(container)
+	container := htmlelement.NewDiv(body, "container")
 	container.AddClass("container")
 	elements.CreateHeader(container)
 	elements.CreateMainBody(container, data)

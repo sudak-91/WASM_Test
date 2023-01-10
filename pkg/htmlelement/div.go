@@ -3,27 +3,26 @@ package htmlelement
 type Div struct {
 	HtmlElement
 	HtmlClass
+	parent    Parent
 	Id        string
 	InnerHtml string
 }
 
 //NewDiv create Div's object
-func NewDiv() *Div {
+func NewDiv(parent Parent, id string) *Div {
 	var (
 		div Div
 	)
-	div.elem = GetDocument().Call("createElement", "div")
+	div.Id = id
+	div.parent = parent
+	parent.SetChild(&div)
+	//div.elem = GetDocument().Call("createElement", "div")
 	return &div
 }
 
-//CreateChildDiv create html div and append to child tree
-func (d *Div) CreateChildDiv() *Div {
-	div := NewDiv()
-	d.AddChild(div)
-	return div
-}
-
 func (d *Div) Render() {
+	d.elem = GetDocument().Call("createElement", "div")
+	d.SetId(d.Id)
 	d.AddClassSliceToClassList(d.elem)
 	for _, v := range d.ChildElement {
 		render, ok := v.(Renderer)

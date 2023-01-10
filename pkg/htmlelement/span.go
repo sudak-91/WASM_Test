@@ -4,18 +4,23 @@ type Span struct {
 	HtmlElement
 	HtmlClass
 	Text string
+	Id   string
 }
 
-func NewSpan(Text string) *Span {
+func NewSpan(parent Parent, id string, text string) *Span {
 	var (
 		span Span
 	)
-	span.elem = GetDocument().Call("createElement", "span")
-	span.Text = Text
+	//span.elem = GetDocument().Call("createElement", "span")
+	span.Text = text
+	span.Id = id
+	parent.SetChild(&span)
 	return &span
 }
 
 func (s *Span) Render() {
+	s.CreateElement("span")
+	s.SetId(s.Id)
+	s.SetInnerHtml(s.Text)
 	s.AddClassSliceToClassList(s.GetJs())
-	s.Set("innerHTML", s.Text)
 }
