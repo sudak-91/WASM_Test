@@ -1,6 +1,8 @@
 package htmlelement
 
-import "syscall/js"
+import (
+	"syscall/js"
+)
 
 type Button struct {
 	HtmlElement
@@ -8,17 +10,18 @@ type Button struct {
 	HtmlAttribute
 	Type        string
 	Id          string
+	Text        string
 	OnClickFunc *js.Func
 }
 
-func NewButton(parent Parent, id string, btnType string) *Button {
+func NewButton(parent Parent, id string, btnType string, text string) *Button {
 	var (
 		btn Button
 	)
 	btn.Id = id
 	btn.Type = btnType
+	btn.Text = text
 	parent.SetChild(&btn)
-	//btn.elem = GetDocument().Call("createElement", "button")
 	return &btn
 }
 
@@ -31,7 +34,10 @@ func (b *Button) AddClickEventListener(jFunc *js.Func) {
 func (b *Button) Render() {
 	b.CreateElement("button")
 	b.set("type", b.Type)
+	b.SetInnerHtml(b.Text)
 	b.SetId(b.Id)
 	b.AddClassSliceToClassList(b.elem)
-
+	if b.OnClickFunc != nil {
+		b.elem.Call("addEventListener", "click", *b.OnClickFunc)
+	}
 }

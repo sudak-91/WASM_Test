@@ -1,19 +1,24 @@
 package elements
 
 import (
+	"crypto/sha512"
 	"fmt"
+	"log"
 	"syscall/js"
 
-	"github.com/sudak-91/wasm-test/internal/types"
+	"github.com/sudak-91/wasm-test/internal/pkg/updater"
+	update_types "github.com/sudak-91/wasm-test/pkg/const"
 	"github.com/sudak-91/wasm-test/pkg/htmlelement"
+	"github.com/sudak-91/wasm-test/pkg/repository"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type Signin struct {
 	p      *htmlelement.Paragraph
-	Sender chan types.Update
+	Sender chan updater.Update
 }
 
-func NewSignIn(c chan types.Update) Signin {
+func NewSignIn(c chan updater.Update) Signin {
 	var s Signin
 	s.Sender = c
 	return s
@@ -37,9 +42,9 @@ func (s Signin) CreateSignIn(parent htmlelement.Parent) *htmlelement.Div {
 	passSpan.AddClass("input-group-text")
 	passInput := htmlelement.NewInput(passDiv, "password", "password")
 	passInput.AddClass("form-control")
-	btn := htmlelement.NewButton(container, "signInButton", "button")
+	btn := htmlelement.NewButton(container, "signInButton", "button", "Логин")
 	btn.AddClass("btn")
-	btn.AddClass("btn-outline-#orange-600")
+	btn.AddClass("btn-primary")
 	var signInFunc js.Func
 	signInFunc = js.FuncOf(s.SignInFunc)
 	btn.AddClickEventListener(&signInFunc)
@@ -50,20 +55,22 @@ func (s Signin) CreateSignIn(parent htmlelement.Parent) *htmlelement.Div {
 
 func (s Signin) SignInFunc(this js.Value, args []js.Value) any {
 	var (
-		signIn types.SignIn
-		Update types.Update
+		user   repository.User
+		Update updater.Update
 	)
-	Update.Type = "sign_in"
+	fmt.Println("Click")
+	Update.Type = update_types.LoginUpdater
 
-	login := htmlelement.GetDocument().Call("getElementById", "signin")
+	login := htmlelement.GetDocument().Call("getElementById", "loginInput")
 	vLogin := login.Get("value")
 	fmt.Println(vLogin.String())
 	r := htmlelement.GetInputValue("password")
 	fmt.Println(r)
-	signIn.Login = vLogin.String()
-	signIn.Password = r
-	Update.Data = signIn
-	s.p.ChangeText("Formaling")
+	user.ID = primitive.NewObjectID()
+	user.Login = fmt.Sprintf("%x", sha512.Sum512([]byte(vLogin.String())))
+	user.Password = fmt.Sprintf("%x", sha512.Sum512([]byte(r)))
+	Update.SignIn = &user
+	log.Println(Update)
 	s.Sender <- Update
 
 	return nil

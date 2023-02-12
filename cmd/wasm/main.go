@@ -4,20 +4,22 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"net"
 	"net/url"
 	"syscall/js"
 	"time"
 
 	"github.com/sudak-91/wasm-test/internal/front/elements"
-	"github.com/sudak-91/wasm-test/internal/types"
+	"github.com/sudak-91/wasm-test/internal/pkg/updater"
 	"github.com/sudak-91/wasm-test/pkg/htmlelement"
 	"nhooyr.io/websocket"
 	"nhooyr.io/websocket/wsjson"
 )
 
-var data = make(chan types.Update)
+var data = make(chan updater.Update)
 
 func main() {
+	fmt.Println("Start Main")
 	var (
 		body = htmlelement.GetBody()
 		//onClick   js.Func
@@ -35,13 +37,16 @@ func main() {
 			Host: "0.0.0.0:8000",
 			Path: "/ws"}
 	)
-	fmt.Println("Connect to", u)
+	Render(body)
+
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
-	c, _, err := websocket.Dial(ctx, u.String(), nil)
+	fmt.Println("Start Connect to", u.String())
+	c, responce, err := websocket.Dial(ctx, u.String(), nil)
 	if err != nil {
 		log.Printf("we have an error:%s", err.Error())
 	}
+	fmt.Println(responce.StatusCode)
 	defer c.Close(websocket.StatusInternalError, "the sky is falling")
 	go func() {
 		for {
@@ -54,7 +59,7 @@ func main() {
 		}
 	}()
 	go Writer(c, ctx)
-	Render(body)
+
 	/*body.AddChild(contDiv)
 	contDiv.AddClass("container")
 	header.AddClass("row")
@@ -83,17 +88,45 @@ func main() {
 	param := rawParam.String()
 	route := strings.Split(param, "/")
 	fmt.Println(route)
-	leftColumn.GetJs().Set("id", "main")
-	body.Render()*/
+	leftColumn.GetJs().Set("id", "main")*/
 	fmt.Println("Hello WASM")
+	go func() {
+		fmt.Println("start")
+		listener, err := net.Listen("tcp", "192.168.1.193:8080")
+		if err != nil {
+			fmt.Println(err.Error())
+			return
+
+		}
+		fmt.Println("listen")
+		c, err := listener.Accept()
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		for {
+
+			if err != nil {
+				log.Println("err")
+			}
+			fmt.Println(c.LocalAddr())
+		}
+		fmt.Println("Error")
+
+	}()
 	b := make(chan bool)
 	<-b
+	fmt.Println("Close")
 }
 func Render(body *htmlelement.Body) {
+	fmt.Println("Start Render")
 	container := htmlelement.NewDiv(body, "container")
 	container.AddClass("container")
+	fmt.Println("Render header")
 	elements.CreateHeader(container)
+	fmt.Println("Start Main Body")
 	elements.CreateMainBody(container, data)
+	fmt.Println("Stop Render")
 	body.Render()
 
 }
@@ -120,7 +153,7 @@ func TestButtonWithParam(this js.Value, args []js.Value) any {
 	//a := this.Get("value")
 	//fmt.Println(a)
 	fmt.Println(args[0].String())
-	data <- types.Update{Type: "test"}
+	data <- updater.Update{Type: "test"}
 	return nil
 }
 

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
@@ -9,6 +10,13 @@ import (
 
 	"github.com/gorilla/mux"
 	wSocket "github.com/gorilla/websocket"
+	"github.com/joho/godotenv"
+	"github.com/sudak-91/wasm-test/internal/pkg/handler"
+	mongorepository "github.com/sudak-91/wasm-test/internal/pkg/mongo_repository"
+	"github.com/sudak-91/wasm-test/internal/pkg/updater"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
 var Upgrader = wSocket.Upgrader{}
@@ -54,44 +62,48 @@ func (h spaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	err := godotenv.Load("../../.env")
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
 	router := mux.NewRouter()
-	//router.Handle("/", http.FileServer(http.Dir("../../template")))
-	//router.Handle("/post/", http.StripPrefix("/post/", http.FileServer(http.Dir("../../template"))))
 	spa := spaHandler{staticPath: "../../template", indexPath: "index.html"}
-	router.HandleFunc("/ws", getWebSocket)
+	client := connectToMongoDb()
+	defer func() {
+		client.Disconnect(context.TODO())
+	}()
+	DB := client.Database("blog")
+	MongoRepository := mongorepository.NewMongoRepository(DB)
+	Updater := updater.NewUpdater(MongoRepository.Users)
+	wshandler := handler.NewWSHandler(Upgrader, Updater)
+	router.Handle("/ws", wshandler)
 	router.PathPrefix("/").Handler(spa)
+
 	go func() {
+
 		if err := http.ListenAndServe("0.0.0.0:8000", router); err != nil {
 			panic(err.Error())
 		}
-	}()
 
-	b := make(chan bool)
+	}()
+	b := make(chan (bool))
 	<-b
 
 }
 
-func getWebSocket(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("run")
-	Upgrader.CheckOrigin = func(r *http.Request) bool { return true }
-	c, err := Upgrader.Upgrade(w, r, nil)
+func connectToMongoDb() *mongo.Client {
+	login := os.Getenv("MONGO_DB_USER")
+	pass := os.Getenv("MONGO_DB_PASS")
+	host := os.Getenv("MONGO_DB_HOST")
+	ConnectionString := fmt.Sprintf("mongodb://%s:%s@%s/?maxPoolSize=20&w=majority", login, pass, host)
+	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(ConnectionString))
 	if err != nil {
-		log.Println("Upgrader", err.Error())
-		return
+		log.Fatal("MongoDB connection error")
 	}
-	defer c.Close()
-	for {
-		mt, message, err := c.ReadMessage()
-		if err != nil {
-			log.Println(err.Error())
-			break
-		}
-		log.Println(string(message[:]))
-		err = c.WriteMessage(mt, []byte("right right right"))
-		if err != nil {
-			log.Println(err.Error())
-			break
-		}
+	if err = client.Ping(context.TODO(), readpref.Primary()); err != nil {
+		log.Fatal("Ping MongoDB error")
 	}
-
+	log.Println("Successfully connected and pinged")
+	return client
 }
