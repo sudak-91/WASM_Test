@@ -24,14 +24,8 @@ func NewUpdater(repository pubrep.Users) Updater {
 func (u Updater) Controler(update Update) error {
 	switch update.Type {
 	case "login":
-		log.Println("login Update")
-		log.Printf("%+v", update.SignIn)
-		err := SignInUpdater(u.repoUser, *update.SignIn)
-		if err != nil {
-			return err
-		}
-		//fmt.Println(data.Login)
-		//fmt.Println(data.Password)
+	case "registration":
+
 	default:
 		log.Println("Default")
 
