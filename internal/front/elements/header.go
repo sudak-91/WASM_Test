@@ -23,7 +23,7 @@ func CreateHeader(container htmlelement.Parent) *htmlelement.Div {
 	signInDiv := htmlelement.NewDiv(header, "signInDiv")
 	signInDiv.AddClass("col-1")
 	signInDiv.AddClass("align-items-center")
-	signInCollapseButton := htmlelement.NewButton(signInDiv, "signInCollapseBtn", "button", "")
+	/*signInCollapseButton := htmlelement.NewButton(signInDiv, "signInCollapseBtn", "button", "")
 	signInCollapseButton.AddClass("btn")
 	signInCollapseButton.AddClass("btn-primary")
 	signInCollapseDiv := htmlelement.NewDiv(header, "collapseDiv")
@@ -31,7 +31,7 @@ func CreateHeader(container htmlelement.Parent) *htmlelement.Div {
 	signInCollapseDiv.AddClass("collapsexample")
 	innerSignInDinv := htmlelement.NewDiv(signInCollapseDiv, "innerSignInDiv")
 	innerSignInDinv.AddClass("card")
-	innerSignInDinv.AddClass("card-body")
+	innerSignInDinv.AddClass("card-body")*/
 	//signInCollapseButton.GetJs().Set("data-bs-toggle", "collapse")
 	return header
 }

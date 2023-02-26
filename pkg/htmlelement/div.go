@@ -8,7 +8,7 @@ type Div struct {
 	InnerHtml string
 }
 
-//NewDiv create Div's object
+// NewDiv create Div's object
 func NewDiv(parent Parent, id string) *Div {
 	var (
 		div Div

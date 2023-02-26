@@ -4,31 +4,32 @@ import (
 	"log"
 
 	pubrep "github.com/sudak-91/wasm-test/pkg/repository"
+	pubupdater "github.com/sudak-91/wasm-test/pkg/updater"
 )
 
 type Updater struct {
-	repoUser pubrep.Users
+	repo pubrep.Repository
 }
 
-type Update struct {
-	Type   string       `json:"type"`
-	SignIn *pubrep.User `json:"signin,omitempty"`
-}
-
-func NewUpdater(repository pubrep.Users) Updater {
+func NewUpdater(repository pubrep.Repository) Updater {
 	return Updater{
-		repoUser: repository,
+		repo: repository,
 	}
 }
 
-func (u Updater) Controler(update Update) error {
+func (u Updater) Controler(update pubupdater.Update) error {
 	switch update.Type {
 	case "login":
+		return nil
 	case "registration":
-
+		err := u.registrationUpdater(update.Data)
+		if err != nil {
+			return err
+		}
+		return nil
 	default:
 		log.Println("Default")
+		return nil
 
 	}
-	return nil
 }

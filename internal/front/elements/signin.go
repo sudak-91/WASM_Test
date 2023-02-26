@@ -6,19 +6,19 @@ import (
 	"log"
 	"syscall/js"
 
-	"github.com/sudak-91/wasm-test/internal/pkg/updater"
 	update_types "github.com/sudak-91/wasm-test/pkg/const"
 	"github.com/sudak-91/wasm-test/pkg/htmlelement"
 	"github.com/sudak-91/wasm-test/pkg/repository"
+	pubupdater "github.com/sudak-91/wasm-test/pkg/updater"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type Signin struct {
 	p      *htmlelement.Paragraph
-	Sender chan updater.Update
+	Sender chan pubupdater.Update
 }
 
-func NewSignIn(c chan updater.Update) Signin {
+func NewSignIn(c chan pubupdater.Update) Signin {
 	var s Signin
 	s.Sender = c
 	return s
@@ -56,7 +56,7 @@ func (s Signin) CreateSignIn(parent htmlelement.Parent) *htmlelement.Div {
 func (s Signin) SignInFunc(this js.Value, args []js.Value) any {
 	var (
 		user   repository.User
-		Update updater.Update
+		Update pubupdater.Update
 	)
 	fmt.Println("Click")
 	Update.Type = update_types.LoginUpdater
@@ -69,7 +69,7 @@ func (s Signin) SignInFunc(this js.Value, args []js.Value) any {
 	user.ID = primitive.NewObjectID()
 	user.Login = fmt.Sprintf("%x", sha512.Sum512([]byte(vLogin.String())))
 	user.Password = fmt.Sprintf("%x", sha512.Sum512([]byte(r)))
-	Update.SignIn = &user
+	Update.Data = user
 	log.Println(Update)
 	s.Sender <- Update
 

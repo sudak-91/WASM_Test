@@ -4,19 +4,18 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"net"
 	"net/url"
 	"syscall/js"
 	"time"
 
 	"github.com/sudak-91/wasm-test/internal/front/elements"
-	"github.com/sudak-91/wasm-test/internal/pkg/updater"
 	"github.com/sudak-91/wasm-test/pkg/htmlelement"
+	pubupdater "github.com/sudak-91/wasm-test/pkg/updater"
 	"nhooyr.io/websocket"
 	"nhooyr.io/websocket/wsjson"
 )
 
-var data = make(chan updater.Update)
+var data = make(chan pubupdater.Update)
 
 func main() {
 	fmt.Println("Start Main")
@@ -90,30 +89,6 @@ func main() {
 	fmt.Println(route)
 	leftColumn.GetJs().Set("id", "main")*/
 	fmt.Println("Hello WASM")
-	go func() {
-		fmt.Println("start")
-		listener, err := net.Listen("tcp", "192.168.1.193:8080")
-		if err != nil {
-			fmt.Println(err.Error())
-			return
-
-		}
-		fmt.Println("listen")
-		c, err := listener.Accept()
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-		for {
-
-			if err != nil {
-				log.Println("err")
-			}
-			fmt.Println(c.LocalAddr())
-		}
-		fmt.Println("Error")
-
-	}()
 	b := make(chan bool)
 	<-b
 	fmt.Println("Close")
@@ -153,7 +128,7 @@ func TestButtonWithParam(this js.Value, args []js.Value) any {
 	//a := this.Get("value")
 	//fmt.Println(a)
 	fmt.Println(args[0].String())
-	data <- updater.Update{Type: "test"}
+	data <- pubupdater.Update{Type: "test"}
 	return nil
 }
 

@@ -8,6 +8,7 @@ import (
 
 	"github.com/gorilla/websocket"
 	"github.com/sudak-91/wasm-test/internal/pkg/updater"
+	pubupdater "github.com/sudak-91/wasm-test/pkg/updater"
 )
 
 type WSHandler struct {
@@ -39,7 +40,7 @@ func (ws *WSHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 		log.Println(string(message[:]))
-		var update updater.Update
+		var update pubupdater.Update
 		err = json.Unmarshal(message, &update)
 		if err != nil {
 			log.Println("Unmwrshal error")
